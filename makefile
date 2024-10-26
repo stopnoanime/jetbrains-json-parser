@@ -2,7 +2,7 @@ CXX := g++
 CXXFLAGS := -Wall -Wextra -std=c++17
 
 TARGET := main
-SRCS := main.cpp lexer.cpp parser.cpp eval.cpp json.cpp
+SRCS := main.cpp lexer.cpp parser.cpp json.cpp query-lexer.cpp query-eval.cpp 
 OBJS := $(SRCS:.cpp=.o)
 
 .PHONY: all clean run
