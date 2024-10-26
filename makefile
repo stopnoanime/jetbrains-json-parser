@@ -1,8 +1,8 @@
 CXX := g++
-CXXFLAGS := -Wall -Wextra -std=c++11
+CXXFLAGS := -Wall -Wextra -std=c++17
 
 TARGET := main
-SRCS := main.cpp lexer.cpp parser.cpp
+SRCS := main.cpp lexer.cpp parser.cpp eval.cpp json.cpp
 OBJS := $(SRCS:.cpp=.o)
 
 .PHONY: all clean run
@@ -16,7 +16,7 @@ $(TARGET): $(OBJS)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 clean:
-	rm -f $(OBJS) $(TARGET)
+	rm -f $(OBJS) $(TARGET) 
 
 run: $(TARGET)
 	./main

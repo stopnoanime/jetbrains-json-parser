@@ -13,10 +13,8 @@ enum TokenType {
   COLON,
   COMMA,
   STRING,
-  VAL_TRUE,
-  VAL_FALSE,
-  VAL_NULL,
-  NUMBER
+  NUMBER,
+  CONSTANT
 };
 
 struct Token {

@@ -55,13 +55,9 @@ std::vector<Token> lexer(std::string &str) {
 
       std::string next4(4, c);
       ss.read(&next4[1], 3);
-
-      if (next4 == "true")
-        tokens.push_back({VAL_TRUE, value});
-      else if (next4 == "false")
-        tokens.push_back({VAL_FALSE, value});
-      else if (next4 == "null")
-        tokens.push_back({VAL_NULL, value});
+      
+      if (next4 == "true" || next4 == "false" || next4 == "null")
+        tokens.push_back({CONSTANT, next4});
       else
         throw std::runtime_error("Invalid JSON format.");
     }
