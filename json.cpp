@@ -1,5 +1,6 @@
 #include "json.h"
 #include <sstream>
+#include <limits>
 
 JsonArray::JsonArray(std::vector<std::shared_ptr<JsonNode>> init) : JsonNode(JsonNode::JSON_ARRAY) {
   values = init;
@@ -19,6 +20,36 @@ void JsonArray::serialize(std::ostream& os) const {
 
 const JsonNode &JsonArray::operator[](int index) const {
   return *values[index];
+}
+
+double JsonArray::getMin() const {
+  double min = std::numeric_limits<double>::max();
+  
+  for(auto it = values.begin(); it != values.end(); ++it) {
+    if ((*it)->getType() != JsonNode::JSON_NUMBER)
+      throw std::runtime_error("Error: array must contain numbers");
+    
+    min = std::min(min, static_cast<const JsonNumber &>(**it).getValue());
+  }
+  
+  return min;
+}
+
+double JsonArray::getMax() const {
+  double max = std::numeric_limits<double>::min();
+  
+  for(auto it = values.begin(); it != values.end(); ++it) {
+    if ((*it)->getType() != JsonNode::JSON_NUMBER)
+      throw std::runtime_error("Error: array must contain numbers");
+    
+    max = std::max(max, static_cast<const JsonNumber &>(**it).getValue());
+  }
+  
+  return max;
+}
+
+size_t JsonArray::getSize() const {
+  return values.size();
 }
 
 
@@ -42,6 +73,9 @@ const JsonNode& JsonObject::operator[](std::string index) const {
   return *values.at(index);
 }
 
+size_t JsonObject::getSize() const {
+  return values.size();
+}
 
 JsonString::JsonString(std::string init) : JsonNode(JsonNode::JSON_STRING) {
   value = init;

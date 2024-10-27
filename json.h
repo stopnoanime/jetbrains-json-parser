@@ -38,6 +38,9 @@ public:
   void serialize(std::ostream &os) const;
 
   const JsonNode &operator[](int index) const;
+  double getMin() const;
+  double getMax() const;
+  size_t getSize() const;
 };
 
 class JsonObject : public JsonNode {
@@ -49,6 +52,7 @@ public:
   void serialize(std::ostream &os) const;
 
   const JsonNode &operator[](std::string index) const;
+  size_t getSize() const;
 };
 
 class JsonString : public JsonNode {
