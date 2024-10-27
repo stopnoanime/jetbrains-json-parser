@@ -10,6 +10,9 @@ class QueryEval {
   static const JsonNode &eval_subscript(const JsonNode &rootNode,
                                         const JsonNode &node, Iter &start,
                                         Iter &end);
+  static const JsonNode &eval_function(const JsonNode &rootNode,
+                                       const JsonNode &node, Iter &start,
+                                       Iter &end);
   static const JsonNode &eval_identifier(const JsonNode &rootNode,
                                          const JsonNode &node, Iter &start,
                                          Iter &end);
@@ -18,7 +21,7 @@ class QueryEval {
                                                Iter &start, Iter &end);
 
 public:
-  static const JsonNode &eval(const JsonNode &rootNode, Iter &start, Iter &end);
+  static const JsonNode &eval(const JsonNode &rootNode,Iter &start, Iter &end);
 };
 
 #endif

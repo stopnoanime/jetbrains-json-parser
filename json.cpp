@@ -1,12 +1,8 @@
 #include "json.h"
 #include <sstream>
 
-JsonArray::JsonArray(std::vector<std::shared_ptr<JsonNode>> init) {
+JsonArray::JsonArray(std::vector<std::shared_ptr<JsonNode>> init) : JsonNode(JsonNode::JSON_ARRAY) {
   values = init;
-}
-
-JsonNode::NodeType JsonArray::getType() const {
-  return JsonNode::JSON_ARRAY;
 }
 
 void JsonArray::serialize(std::ostream& os) const {
@@ -21,13 +17,13 @@ void JsonArray::serialize(std::ostream& os) const {
   os<<" ]";
 }
 
-
-JsonObject::JsonObject(std::unordered_map<std::string, std::shared_ptr<JsonNode>> init) {
-  values = init;
+const JsonNode &JsonArray::operator[](int index) const {
+  return *values[index];
 }
 
-JsonNode::NodeType JsonObject::getType() const {
-  return JsonNode::JSON_OBJECT;
+
+JsonObject::JsonObject(std::unordered_map<std::string, std::shared_ptr<JsonNode>> init) : JsonNode(JsonNode::JSON_OBJECT) {
+  values = init;
 }
 
 void JsonObject::serialize(std::ostream& os) const {
@@ -46,38 +42,35 @@ const JsonNode& JsonObject::operator[](std::string index) const {
   return *values.at(index);
 }
 
-JsonString::JsonString(std::string init) {
-  value = init;
-}
 
-JsonNode::NodeType JsonString::getType() const {
-  return JsonNode::JSON_STRING;
+JsonString::JsonString(std::string init) : JsonNode(JsonNode::JSON_STRING) {
+  value = init;
 }
 
 void JsonString::serialize(std::ostream& os) const {
   os<<'"'<<value<<'"';
 }
 
-
-JsonNumber::JsonNumber(double init) {
-  value = init;
+std::string JsonString::getValue() const {
+  return value;
 }
 
-JsonNode::NodeType JsonNumber::getType() const {
-  return JsonNode::JSON_NUMBER;
+
+JsonNumber::JsonNumber(double init) : JsonNode(JsonNode::JSON_NUMBER) {
+  value = init;
 }
 
 void JsonNumber::serialize(std::ostream& os) const {
   os<<value;
 }
 
-
-JsonConstant::JsonConstant(ConstantType init) {
-  value = init;
+double JsonNumber::getValue() const {
+  return value;
 }
 
-JsonNode::NodeType JsonConstant::getType() const {
-  return JsonNode::JSON_CONSTANT;
+
+JsonConstant::JsonConstant(ConstantType init) : JsonNode(JsonNode::JSON_CONSTANT) {
+  value = init;
 }
 
 void JsonConstant::serialize(std::ostream& os) const {

@@ -17,12 +17,12 @@ int main() {
   
   std::cout<<*rootNode<<std::endl;
 
-  std::string query = "a.b";
+  std::string query = "a.b[a.b[1]]";
   auto query_out = QueryLexer().lex(query);
   auto query_start = query_out.begin();
   auto query_end = query_out.end();
 
-  auto query_eval = &QueryEval().eval(*rootNode, query_start, query_end);
+  const JsonNode& query_eval = QueryEval().eval(*rootNode, query_start, query_end);
 
-  std::cout<<*query_eval<<std::endl;
+  std::cout<<query_eval<<std::endl;
 }
