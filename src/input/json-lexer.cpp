@@ -1,6 +1,8 @@
-#include "lexer.h"
+#include "json-lexer.h"
 
-std::vector<Token> lexer(std::string &str) {
+namespace json_lexer {
+
+std::vector<Token> lex(std::string &str) {
   std::stringstream ss(str);
   std::vector<Token> tokens;
   char c;
@@ -39,7 +41,7 @@ std::vector<Token> lexer(std::string &str) {
       break;
 
     default:
-      if(std::isspace(c))
+      if (std::isspace(c))
         break;
 
       if (std::isdigit(c)) {
@@ -49,13 +51,13 @@ std::vector<Token> lexer(std::string &str) {
           value += ss.get();
 
         tokens.push_back({NUMBER, value});
-        
+
         break;
       }
 
       std::string next4(4, c);
       ss.read(&next4[1], 3);
-      
+
       if (next4 == "true" || next4 == "false" || next4 == "null")
         tokens.push_back({CONSTANT, next4});
       else
@@ -65,3 +67,5 @@ std::vector<Token> lexer(std::string &str) {
 
   return tokens;
 }
+
+} // namespace json_lexer

@@ -1,9 +1,11 @@
-#ifndef LEXER_H
-#define LEXER_H
+#ifndef JSON_LEXER_H
+#define JSON_LEXER_H
 
 #include <sstream>
 #include <string>
 #include <vector>
+
+namespace json_lexer {
 
 enum TokenType {
   OBJ_START,
@@ -22,6 +24,8 @@ struct Token {
   std::string value;
 };
 
-std::vector<Token> lexer(std::string &str);
+std::vector<Token> lex(std::string &str);
+
+} // namespace json_lexer
 
 #endif

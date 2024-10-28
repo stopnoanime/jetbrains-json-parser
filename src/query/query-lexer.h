@@ -5,8 +5,7 @@
 #include <string>
 #include <vector>
 
-class QueryLexer {
-public:
+namespace query_lexer {
   enum TokenType {
     IDENTIFIER,
     NUMBER,
@@ -23,7 +22,7 @@ public:
     std::string value;
   };
 
-  static std::vector<Token> lex(std::string &str);
+  std::vector<Token> lex(std::string &str);
 };
 
 #endif

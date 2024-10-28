@@ -1,6 +1,7 @@
 #include "query-lexer.h"
 
-std::vector<QueryLexer::Token> QueryLexer::lex(std::string &str) {
+namespace query_lexer {
+std::vector<Token> lex(std::string &str) {
   std::stringstream ss(str);
   std::vector<Token> tokens;
   char c;
@@ -34,7 +35,7 @@ std::vector<QueryLexer::Token> QueryLexer::lex(std::string &str) {
       break;
 
     default:
-      if(std::isspace(c))
+      if (std::isspace(c))
         break;
 
       if (std::isdigit(c)) {
@@ -44,7 +45,7 @@ std::vector<QueryLexer::Token> QueryLexer::lex(std::string &str) {
           value += ss.get();
 
         tokens.push_back({NUMBER, value});
-        
+
         break;
       }
 
@@ -55,7 +56,7 @@ std::vector<QueryLexer::Token> QueryLexer::lex(std::string &str) {
           value += ss.get();
 
         tokens.push_back({IDENTIFIER, value});
-        
+
         break;
       }
 
@@ -65,3 +66,4 @@ std::vector<QueryLexer::Token> QueryLexer::lex(std::string &str) {
 
   return tokens;
 }
+} // namespace query_lexer
