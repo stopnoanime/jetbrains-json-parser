@@ -1,6 +1,7 @@
 #include "query-lexer.h"
 
 namespace query_lexer {
+
 std::vector<Token> lex(std::string &str) {
   std::stringstream ss(str);
   std::vector<Token> tokens;
@@ -38,21 +39,11 @@ std::vector<Token> lex(std::string &str) {
       if (std::isspace(c))
         break;
 
-      if (std::isdigit(c)) {
+      // read identifier
+      if (std::isalpha(c) || c == '_') {
         value += c;
 
-        while (std::isdigit(ss.peek()))
-          value += ss.get();
-
-        tokens.push_back({NUMBER, value});
-
-        break;
-      }
-
-      if (std::isalnum(c)) {
-        value += c;
-
-        while (std::isalnum(ss.peek()))
+        while (std::isalnum(ss.peek()) || ss.peek() == '_')
           value += ss.get();
 
         tokens.push_back({IDENTIFIER, value});
@@ -60,7 +51,15 @@ std::vector<Token> lex(std::string &str) {
         break;
       }
 
-      throw std::runtime_error("Invalid Query format.");
+      // go back one character and try reading a number
+      ss.seekg(-1, std::ios_base::cur);
+      double num;
+      if (ss >> num) {
+        tokens.push_back({NUMBER, std::to_string(num)});
+        break;
+      }
+
+      throw std::runtime_error("Unexpected character found while lexing query.");
     }
   }
 

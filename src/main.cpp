@@ -7,15 +7,15 @@
 #include <string>
 
 int main() {
-  std::string json = R"({"a": { "b": [ 1, 2, { "c": "testd" }, [11, 12] ]}})";
-  std::string query = "a.b[max(1,3)][0]";
+  std::string json = R"({"a": { "b": [ 1, 2, { "c": false }, [11, 12] ]}})";
+  std::string query = "a.b[max(a.b[0], 3)][1]";
 
   try {
     auto rootNode = json_parser::parse(json_lexer::lex(json));
     std::cout << *rootNode << std::endl;
 
-    auto queryOut = &query_eval::eval(*rootNode, query_lexer::lex(query));
-    std::cout << *queryOut << std::endl;
+    std::string queryOut = query_eval::eval(*rootNode, query_lexer::lex(query));
+    std::cout << queryOut << std::endl;
   } catch (const std::runtime_error &e) {
     std::cerr << e.what() << '\n';
   }

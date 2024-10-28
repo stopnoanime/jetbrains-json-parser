@@ -2,68 +2,78 @@
 
 namespace json_lexer {
 
+Token read_token(char c, std::stringstream &ss) {
+  std::string value;
+
+  switch (c) {
+  case '{':
+    return {OBJ_START, value};
+    break;
+
+  case '}':
+    return {OBJ_END, value};
+    break;
+
+  case '[':
+    return {ARRAY_START, value};
+    break;
+
+  case ']':
+    return {ARRAY_END, value};
+    break;
+
+  case ':':
+    return {COLON, value};
+    break;
+
+  case ',':
+    return {COMMA, value};
+    break;
+
+  case '"':
+    std::getline(ss, value, '"');
+    if (ss.eof() || ss.fail())
+      throw std::runtime_error("Could not find string's closing quote.");
+
+    return {STRING, value};
+    break;
+
+  default:
+    if (std::isspace(c))
+      break;
+
+    // go back one character and try reading number
+    ss.seekg(-1, std::ios_base::cur);
+    double num;
+    if (ss >> num) {
+      return {NUMBER, std::to_string(num)};
+      break;
+    }
+
+    ss.clear(); // reading number failed so we must clear the error flag
+
+    // try reading constant
+    const std::vector<std::string> constants = {"true", "false", "null"};
+    std::string buffer = ss.str().substr(ss.tellg());
+
+    for (auto &s : constants) {
+      if (buffer.compare(0, s.size(), s) == 0) {
+        ss.seekg(s.size(), std::ios_base::cur);
+        return {CONSTANT, s};
+      }
+    }
+  }
+
+  throw std::runtime_error("Unexpected character found while lexing JSON.");
+}
+
 std::vector<Token> lex(std::string &str) {
   std::stringstream ss(str);
   std::vector<Token> tokens;
   char c;
 
-  while (ss >> c) {
-    std::string value;
-
-    switch (c) {
-    case '{':
-      tokens.push_back({OBJ_START, value});
-      break;
-
-    case '}':
-      tokens.push_back({OBJ_END, value});
-      break;
-
-    case '[':
-      tokens.push_back({ARRAY_START, value});
-      break;
-
-    case ']':
-      tokens.push_back({ARRAY_END, value});
-      break;
-
-    case ':':
-      tokens.push_back({COLON, value});
-      break;
-
-    case ',':
-      tokens.push_back({COMMA, value});
-      break;
-
-    case '"':
-      std::getline(ss, value, '"');
-      tokens.push_back({STRING, value});
-      break;
-
-    default:
-      if (std::isspace(c))
-        break;
-
-      if (std::isdigit(c)) {
-        value += c;
-
-        while (std::isdigit(ss.peek()))
-          value += ss.get();
-
-        tokens.push_back({NUMBER, value});
-
-        break;
-      }
-
-      std::string next4(4, c);
-      ss.read(&next4[1], 3);
-
-      if (next4 == "true" || next4 == "false" || next4 == "null")
-        tokens.push_back({CONSTANT, next4});
-      else
-        throw std::runtime_error("Invalid JSON format.");
-    }
-  }
+  while (ss >> c)
+    tokens.push_back(read_token(c, ss));
 
   return tokens;
 }

@@ -20,6 +20,8 @@ public:
   NodeType getType() const;
 
   virtual void serialize(std::ostream &os) const;
+  std::string to_string() const;
+
   friend std::ostream &operator<<(std::ostream &os, const Node &node) {
     node.serialize(os);
     return os;

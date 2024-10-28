@@ -12,6 +12,12 @@ NodeType Node::getType() const { return type; }
 
 void Node::serialize(std::ostream &os) const { os << "Node"; }
 
+std::string Node::to_string() const {
+  std::ostringstream oss;
+  serialize(oss);
+  return oss.str();
+}
+
 // Array
 
 Array::Array(std::vector<std::unique_ptr<Node>> init)
@@ -29,22 +35,28 @@ void Array::serialize(std::ostream &os) const {
   os << " ]";
 }
 
-const Node &Array::operator[](int index) const { return *values[index]; }
+const Node &Array::operator[](int index) const {
+  if (index < 0 || (unsigned)index >= values.size())
+    throw std::runtime_error("Index: " + std::to_string(index) +
+                             " is out of bounds for array.");
+
+  return *values[index];
+}
 
 double Array::getMinMax(bool isMin) const {
-  double minmaxValue = isMin ? std::numeric_limits<double>::max()
-                             : std::numeric_limits<double>::min();
+  double res = isMin ? std::numeric_limits<double>::max()
+                     : std::numeric_limits<double>::min();
 
-  for (auto it = values.begin(); it != values.end(); ++it) {
-    if ((*it)->getType() != NUMBER)
-      throw std::runtime_error("Error: array must contain numbers");
+  for (auto &value : values) {
+    if (value->getType() != NUMBER)
+      throw std::runtime_error(
+          "Array must only contain numbers to get min/max.");
 
-    double val = static_cast<const Number &>(**it).getValue();
-    minmaxValue =
-        isMin ? std::min(minmaxValue, val) : std::max(minmaxValue, val);
+    double val = static_cast<const Number &>(*value).getValue();
+    res = isMin ? std::min(res, val) : std::max(res, val);
   }
 
-  return minmaxValue;
+  return res;
 }
 
 size_t Array::getSize() const { return values.size(); }
@@ -67,7 +79,11 @@ void Object::serialize(std::ostream &os) const {
 }
 
 const Node &Object::operator[](std::string index) const {
-  return *values.at(index);
+  auto it = values.find(index);
+  if (it == values.end())
+    throw std::runtime_error("Key: " + index + " not found in object.");
+
+  return *it->second;
 }
 
 size_t Object::getSize() const { return values.size(); }
