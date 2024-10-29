@@ -1,18 +1,14 @@
 #include "query-eval.h"
 #include <cmath>
+#include <format>
 #include <limits>
 #include <stdexcept>
-#include <format>
 
 namespace query_eval {
 
-const json::Node &eval_identifier(const json::Node &rootNode,
-                                  const json::Node &node, iter &start,
-                                  iter &end);
-
-const json::Node &eval_access_specifier(const json::Node &rootNode,
-                                        const json::Node &node, iter &start,
-                                        iter &end);
+#define assert_token(token, fail_msg)                                          \
+  if (start == end || (*start++).type != token)                                \
+    throw std::runtime_error(fail_msg);
 
 double eval_minmax(const json::Node &rootNode, iter &start, iter &end,
                    bool isMin) {
@@ -21,51 +17,49 @@ double eval_minmax(const json::Node &rootNode, iter &start, iter &end,
 
   while (true) {
     Result arg = eval_all(rootNode, start, end);
-    double val;
 
-    if (arg.type == ResultType::NUMBER)
-      val = arg.number;
-    else if (arg.type == ResultType::NODE && arg.node->getType() == json::ARRAY)
-      val = static_cast<const json::Array *>(arg.node)->getMinMax(isMin);
-    else if (arg.type == ResultType::NODE &&
-             arg.node->getType() == json::NUMBER)
-      val = static_cast<const json::Number *>(arg.node)->getValue();
-    else
+    double argVal = [](Result arg, bool isMin) {
+      if (arg.type == ResultType::NUMBER)
+        return arg.number;
+      if (arg.node->getType() == json::NUMBER)
+        return static_cast<const json::Number *>(arg.node)->getValue();
+      if (arg.node->getType() == json::ARRAY)
+        return static_cast<const json::Array *>(arg.node)->getMinMax(isMin);
+
       throw std::runtime_error(
           "Arguments of min/max must be numbers, or arrays of numbers.");
+    }(arg, isMin);
 
-    res = isMin ? std::min(res, val) : std::max(res, val);
+    res = isMin ? std::min(res, argVal) : std::max(res, argVal);
 
-    if ((*start).type == query_lexer::ARGS_END) {
-      start++;
-      return res;
-    } else if ((*start++).type != query_lexer::COMMA) {
+    if (start == end || ((*start).type != query_lexer::ARGS_END &&
+                         (*start).type != query_lexer::COMMA))
       throw std::runtime_error(
           "Expected a comma or function argument list end.");
-    }
+
+    if ((*start++).type == query_lexer::ARGS_END)
+      return res;
   }
 }
 
 double eval_size(const json::Node &rootNode, iter &start, iter &end) {
   Result arg = eval_all(rootNode, start, end);
-  size_t size;
 
-  if (arg.type == ResultType::NODE && arg.node->getType() == json::ARRAY)
-    size = static_cast<const json::Array *>(arg.node)->getSize();
-  else if (arg.type == ResultType::NODE && arg.node->getType() == json::OBJECT)
-    size = static_cast<const json::Object *>(arg.node)->getSize();
-  else if (arg.type == ResultType::NODE && arg.node->getType() == json::STRING)
-    size = static_cast<const json::String *>(arg.node)->getValue().size();
-  else
+  size_t size = [](Result arg) {
+    if (arg.type == ResultType::NODE && arg.node->getType() == json::ARRAY)
+      return static_cast<const json::Array *>(arg.node)->getSize();
+    if (arg.type == ResultType::NODE && arg.node->getType() == json::OBJECT)
+      return static_cast<const json::Object *>(arg.node)->getSize();
+    if (arg.type == ResultType::NODE && arg.node->getType() == json::STRING)
+      return static_cast<const json::String *>(arg.node)->getValue().size();
+
     throw std::runtime_error(
         "Argument of size function must be an array, object or string.");
+  }(arg);
 
-  if ((*start).type == query_lexer::ARGS_END) {
-    start++;
-    return size;
-  }
+  assert_token(query_lexer::ARGS_END, "Expected function argument list end.");
 
-  throw std::runtime_error("Expected function argument list end.");
+  return size;
 }
 
 double eval_function(const json::Node &rootNode, iter &start, iter &end) {
@@ -87,36 +81,39 @@ double eval_subscript(const json::Node &rootNode, const json::Node &node,
 
   Result arg = eval_all(rootNode, start, end);
 
-  if ((*start++).type != query_lexer::SUBSCRIPT_END)
-    throw std::runtime_error("Expected a query subscript end.");
+  assert_token(query_lexer::SUBSCRIPT_END, "Expected a query subscript end.");
 
-  double argValue;
+  double argVal = [](Result arg) {
+    if (arg.type == ResultType::NUMBER)
+      return arg.number;
 
-  if (arg.type == ResultType::NUMBER)
-    argValue = arg.number;
-  else if (arg.type == ResultType::NODE && arg.node->getType() == json::NUMBER)
-    argValue = static_cast<const json::Number *>(arg.node)->getValue();
-  else
+    if (arg.node->getType() == json::NUMBER)
+      return static_cast<const json::Number *>(arg.node)->getValue();
+
     throw std::runtime_error("Subscript's value must be a number.");
+  }(arg);
 
-  if (argValue < 0 || std::floor(argValue) != argValue)
-    throw std::runtime_error(
-        "Subscript's value must be a non negative integer.");
+  if (argVal >= 0 && std::floor(argVal) == argVal)
+    return argVal;
 
-  return argValue;
+  throw std::runtime_error("Subscript's value must be a non negative integer.");
 }
+
+const json::Node &eval_access_specifier(const json::Node &rootNode,
+                                        const json::Node &node, iter &start,
+                                        iter &end);
 
 const json::Node &eval_identifier(const json::Node &rootNode,
                                   const json::Node &node, iter &start,
                                   iter &end) {
-  if (start == end || (*start).type != query_lexer::IDENTIFIER)
-    throw std::runtime_error("Expected an object's key identifier in query.");
-
   if (node.getType() != json::OBJECT)
     throw std::runtime_error("Only objects support query identifier access.");
 
-  auto &newNode = static_cast<const json::Object &>(node)[(*start).value];
-  return eval_access_specifier(rootNode, newNode, ++start, end);
+  assert_token(query_lexer::IDENTIFIER,
+               "Expected an object's key identifier in query.");
+
+  auto &newNode = static_cast<const json::Object &>(node)[(*(start - 1)).value];
+  return eval_access_specifier(rootNode, newNode, start, end);
 }
 
 const json::Node &eval_access_specifier(const json::Node &rootNode,
