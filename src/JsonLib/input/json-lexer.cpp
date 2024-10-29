@@ -1,4 +1,5 @@
 #include "json-lexer.h"
+#include <format>
 #include <sstream>
 #include <stdexcept>
 
@@ -48,7 +49,7 @@ Token read_token(char c, std::stringstream &ss) {
     ss.seekg(-1, std::ios_base::cur);
     double num;
     if (ss >> num) {
-      return {NUMBER, std::to_string(num)};
+      return {NUMBER, std::format("{}", num)};
       break;
     }
 

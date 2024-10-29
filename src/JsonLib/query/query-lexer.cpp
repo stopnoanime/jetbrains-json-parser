@@ -1,4 +1,5 @@
 #include "query-lexer.h"
+#include <format>
 #include <sstream>
 #include <stdexcept>
 
@@ -57,7 +58,7 @@ std::vector<Token> lex(const std::string &str) {
       ss.seekg(-1, std::ios_base::cur);
       double num;
       if (ss >> num) {
-        tokens.push_back({NUMBER, std::to_string(num)});
+        tokens.push_back({NUMBER, std::format("{}", num)});
         break;
       }
 

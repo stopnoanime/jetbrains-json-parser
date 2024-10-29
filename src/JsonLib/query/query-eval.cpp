@@ -1,6 +1,8 @@
 #include "query-eval.h"
+#include <cmath>
 #include <limits>
 #include <stdexcept>
+#include <format>
 
 namespace query_eval {
 
@@ -88,12 +90,20 @@ double eval_subscript(const json::Node &rootNode, const json::Node &node,
   if ((*start++).type != query_lexer::SUBSCRIPT_END)
     throw std::runtime_error("Expected a query subscript end.");
 
-  if (arg.type == ResultType::NUMBER)
-    return arg.number;
-  else if (arg.type == ResultType::NODE && arg.node->getType() == json::NUMBER)
-    return static_cast<const json::Number *>(arg.node)->getValue();
+  double argValue;
 
-  throw std::runtime_error("Subscript's value must be a number.");
+  if (arg.type == ResultType::NUMBER)
+    argValue = arg.number;
+  else if (arg.type == ResultType::NODE && arg.node->getType() == json::NUMBER)
+    argValue = static_cast<const json::Number *>(arg.node)->getValue();
+  else
+    throw std::runtime_error("Subscript's value must be a number.");
+
+  if (argValue < 0 || std::floor(argValue) != argValue)
+    throw std::runtime_error(
+        "Subscript's value must be a non negative integer.");
+
+  return argValue;
 }
 
 const json::Node &eval_identifier(const json::Node &rootNode,
@@ -148,6 +158,9 @@ Result eval_all(const json::Node &rootNode, iter &start, iter &end) {
 
 std::string eval(const json::Node &rootNode,
                  std::vector<query_lexer::Token> tokens) {
+  if (rootNode.getType() != json::OBJECT)
+    throw std::runtime_error("Root node must be an object.");
+
   if (tokens.empty())
     return rootNode.to_string();
 
@@ -160,7 +173,7 @@ std::string eval(const json::Node &rootNode,
     throw std::runtime_error("Could not eval entire query.");
 
   if (output.type == ResultType::NUMBER)
-    return std::to_string(output.number);
+    return std::format("{}", output.number);
 
   return output.node->to_string();
 }

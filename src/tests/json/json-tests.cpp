@@ -80,7 +80,7 @@ TEST_CASE("Test json::Number") {
     REQUIRE(num.getType() == json::NUMBER);
   }
 
-  SECTION("Test json::Number::to_string") { REQUIRE(num.to_string() == "423"); }
+  SECTION("Test json::Number::to_string") { REQUIRE(num.to_string() == "42"); }
 
   SECTION("Test json::Number::getValue") { REQUIRE(num.getValue() == 42); }
 }
