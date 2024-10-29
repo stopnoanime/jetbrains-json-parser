@@ -1,6 +1,7 @@
 #include "json.h"
 #include <limits>
 #include <sstream>
+#include <stdexcept>
 
 namespace json {
 

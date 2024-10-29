@@ -1,4 +1,6 @@
 #include "query-eval.h"
+#include <limits>
+#include <stdexcept>
 
 namespace query_eval {
 

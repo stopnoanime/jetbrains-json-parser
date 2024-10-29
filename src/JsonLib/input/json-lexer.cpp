@@ -1,4 +1,6 @@
 #include "json-lexer.h"
+#include <sstream>
+#include <stdexcept>
 
 namespace json_lexer {
 
@@ -67,7 +69,7 @@ Token read_token(char c, std::stringstream &ss) {
   throw std::runtime_error("Unexpected character found while lexing JSON.");
 }
 
-std::vector<Token> lex(std::string &str) {
+std::vector<Token> lex(const std::string &str) {
   std::stringstream ss(str);
   std::vector<Token> tokens;
   char c;

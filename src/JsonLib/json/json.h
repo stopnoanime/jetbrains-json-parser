@@ -1,9 +1,8 @@
-#ifndef JSON_H
-#define JSON_H
+#pragma once
 
 #include <memory>
-#include <unordered_map>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 namespace json {
@@ -84,5 +83,3 @@ public:
   void serialize(std::ostream &os) const;
 };
 } // namespace json
-
-#endif

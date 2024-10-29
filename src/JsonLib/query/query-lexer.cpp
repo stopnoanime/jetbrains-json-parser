@@ -1,8 +1,10 @@
 #include "query-lexer.h"
+#include <sstream>
+#include <stdexcept>
 
 namespace query_lexer {
 
-std::vector<Token> lex(std::string &str) {
+std::vector<Token> lex(const std::string &str) {
   std::stringstream ss(str);
   std::vector<Token> tokens;
   char c;
@@ -59,7 +61,8 @@ std::vector<Token> lex(std::string &str) {
         break;
       }
 
-      throw std::runtime_error("Unexpected character found while lexing query.");
+      throw std::runtime_error(
+          "Unexpected character found while lexing query.");
     }
   }
 

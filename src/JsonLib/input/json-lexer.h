@@ -1,7 +1,5 @@
-#ifndef JSON_LEXER_H
-#define JSON_LEXER_H
+#pragma once
 
-#include <sstream>
 #include <string>
 #include <vector>
 
@@ -24,8 +22,6 @@ struct Token {
   std::string value;
 };
 
-std::vector<Token> lex(std::string &str);
+std::vector<Token> lex(const std::string &str);
 
 } // namespace json_lexer
-
-#endif

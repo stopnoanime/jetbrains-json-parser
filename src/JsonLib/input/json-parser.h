@@ -1,8 +1,7 @@
-#ifndef JSON_PARSER_H
-#define JSON_PARSER_H
+#pragma once
 
-#include <vector>
 #include <memory>
+#include <vector>
 
 #include "../json/json.h"
 #include "json-lexer.h"
@@ -15,5 +14,3 @@ std::unique_ptr<json::Node> parse_all(iter &start, iter &end);
 std::unique_ptr<json::Node> parse(std::vector<json_lexer::Token> tokens);
 
 } // namespace json_parser
-
-#endif

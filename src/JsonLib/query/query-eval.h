@@ -1,8 +1,5 @@
-#ifndef QUERY_EVAL_H
-#define QUERY_EVAL_H
+#pragma once
 
-#include <limits>
-#include <memory>
 #include <string>
 
 #include "../json/json.h"
@@ -31,8 +28,6 @@ const json::Node &eval_access_specifier(const json::Node &rootNode,
 Result eval_all(const json::Node &rootNode, iter &start, iter &end);
 
 std::string eval(const json::Node &rootNode,
-                    std::vector<query_lexer::Token> tokens);
+                 std::vector<query_lexer::Token> tokens);
 
 }; // namespace query_eval
-
-#endif

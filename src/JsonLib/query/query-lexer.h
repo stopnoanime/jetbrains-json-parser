@@ -1,7 +1,5 @@
-#ifndef QUERY_LEXER_H
-#define QUERY_LEXER_H
+#pragma once
 
-#include <sstream>
 #include <string>
 #include <vector>
 
@@ -22,7 +20,5 @@ namespace query_lexer {
     std::string value;
   };
 
-  std::vector<Token> lex(std::string &str);
+  std::vector<Token> lex(const std::string &str);
 };
-
-#endif

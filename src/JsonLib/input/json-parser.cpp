@@ -1,4 +1,5 @@
 #include "json-parser.h"
+#include <stdexcept>
 
 namespace json_parser {
 
