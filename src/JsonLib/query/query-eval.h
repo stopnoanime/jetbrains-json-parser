@@ -17,14 +17,6 @@ struct Result {
   double number;
 };
 
-const json::Node &eval_identifier(const json::Node &rootNode,
-                                  const json::Node &node, iter &start,
-                                  iter &end);
-
-const json::Node &eval_access_specifier(const json::Node &rootNode,
-                                        const json::Node &node, iter &start,
-                                        iter &end);
-
 Result eval_all(const json::Node &rootNode, iter &start, iter &end);
 
 std::string eval(const json::Node &rootNode,

@@ -64,7 +64,7 @@ size_t Array::getSize() const { return values.size(); }
 
 // Object
 
-Object::Object(std::unordered_map<std::string, std::unique_ptr<Node>> init)
+Object::Object(std::map<std::string, std::unique_ptr<Node>> init)
     : Node(OBJECT), values(std::move(init)) {}
 
 void Object::serialize(std::ostream &os) const {

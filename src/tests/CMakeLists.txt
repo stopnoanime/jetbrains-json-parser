@@ -17,4 +17,4 @@ add_executable(tests
     query/query-lexer-tests.cpp
 )
 
-target_link_libraries(tests PRIVATE Catch2::Catch2WithMain)
+target_link_libraries(tests PRIVATE JsonLib Catch2::Catch2WithMain)

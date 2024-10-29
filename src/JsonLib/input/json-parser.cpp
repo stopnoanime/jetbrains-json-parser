@@ -14,6 +14,8 @@ namespace json_parser {
     return values;                                                             \
   }
 
+std::unique_ptr<json::Node> parse_all(iter &start, iter &end);
+
 std::vector<std::unique_ptr<json::Node>> parse_array(iter &start, iter &end) {
   std::vector<std::unique_ptr<json::Node>> values;
 
@@ -29,9 +31,9 @@ std::vector<std::unique_ptr<json::Node>> parse_array(iter &start, iter &end) {
   }
 }
 
-std::unordered_map<std::string, std::unique_ptr<json::Node>>
+std::map<std::string, std::unique_ptr<json::Node>>
 parse_object(iter &start, iter &end) {
-  std::unordered_map<std::string, std::unique_ptr<json::Node>> values;
+  std::map<std::string, std::unique_ptr<json::Node>> values;
 
   return_on_token(json_lexer::OBJ_END);
 
@@ -51,7 +53,7 @@ parse_object(iter &start, iter &end) {
 
     return_on_token(json_lexer::OBJ_END);
 
-    if ((*start).type != json_lexer::COMMA)
+    if ((*start++).type != json_lexer::COMMA)
       throw std::runtime_error("Expected comma or end of object.");
   }
 }

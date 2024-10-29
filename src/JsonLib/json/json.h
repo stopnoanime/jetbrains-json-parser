@@ -2,7 +2,7 @@
 
 #include <memory>
 #include <string>
-#include <unordered_map>
+#include <map>
 #include <vector>
 
 namespace json {
@@ -42,10 +42,10 @@ public:
 
 class Object : public Node {
 private:
-  std::unordered_map<std::string, std::unique_ptr<Node>> values;
+  std::map<std::string, std::unique_ptr<Node>> values;
 
 public:
-  Object(std::unordered_map<std::string, std::unique_ptr<Node>> init);
+  Object(std::map<std::string, std::unique_ptr<Node>> init);
   void serialize(std::ostream &os) const;
 
   const Node &operator[](std::string index) const;

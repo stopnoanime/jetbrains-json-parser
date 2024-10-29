@@ -4,6 +4,14 @@
 
 namespace query_eval {
 
+const json::Node &eval_identifier(const json::Node &rootNode,
+                                  const json::Node &node, iter &start,
+                                  iter &end);
+
+const json::Node &eval_access_specifier(const json::Node &rootNode,
+                                        const json::Node &node, iter &start,
+                                        iter &end);
+
 double eval_minmax(const json::Node &rootNode, iter &start, iter &end,
                    bool isMin) {
   double res = isMin ? std::numeric_limits<double>::max()
